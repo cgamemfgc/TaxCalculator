@@ -9,7 +9,6 @@ import SwiftUI
 
 struct ContentView: View {
     @State var inputText = ""
-    @State var tax8 = 0.0
     @State var tax10 = 0.0
     
     private let numberFormatter = {
@@ -42,7 +41,6 @@ struct ContentView: View {
             
             Button("計算"){
                 let input = Double(inputText) ?? 0
-                tax8 = floor(input * 1.08)
                 tax10 = floor(input * 1.1)
             }
                 .bold()
@@ -57,7 +55,7 @@ struct ContentView: View {
             }
             HStack(){
                 Text("消費税10％：")
-                Text("\(Int(tax10))円")
+                Text(tax10 == 0.0 ?  "" : "\(Int(tax10))円")
             }
             Spacer()
         }
