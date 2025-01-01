@@ -51,11 +51,17 @@ struct ContentView: View {
                 .padding(10)
             HStack(){
                 Text("金額　　　：")
-                Text("\(formatNumber(inputText))円")
+                Text("\(formatNumber(inputText))")
+                    .frame(width: 200,alignment: .trailing)
+                    .lineLimit(1)
+                Text("円")
             }
             HStack(){
                 Text("消費税10％：")
-                Text(tax10 == 0.0 ?  "" : "\(Int(tax10))円")
+                Text(tax10 == 0.0 ?  "" : "\(Int(tax10))")
+                    .frame(width: 200,alignment: .trailing)
+                    .lineLimit(1)
+                Text("円")
             }
             Spacer()
         }
