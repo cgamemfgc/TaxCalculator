@@ -50,6 +50,33 @@ class TaxCalculatorViewModel: ObservableObject {
     }
 }
 
+
+struct AmountDisplayView: View {
+    let title: String
+    let amount: String
+    let isTotal: Bool
+    
+    var body: some View {
+        HStack(spacing: 8){
+            Text(title)
+                .foregroundColor(.gray)
+                .font(.system(size:18))
+                .frame(width: 100, alignment: .leading)
+            
+            Spacer()
+            
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Text(amount)
+                    .font(.system(size: isTotal ? 28 : 24, weight: .bold))
+                    .foregroundColor(isTotal ? .blue: .primary)
+                Text("円")
+                    .foregroundColor(.gray)
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+    
 struct ContentView: View {
     @StateObject private var viewModel = TaxCalculatorViewModel()
     
@@ -78,50 +105,56 @@ struct ContentView: View {
             
             Button(action: viewModel.calculateTax){
                 Text("計算")
-                .bold()
-                .frame(width: 100, height: 50)
-                .foregroundColor(Color.white)
-                .background(Color.orange)
-                .cornerRadius(10)
+                    .bold()
+                    .frame(width: 100, height: 50)
+                    .foregroundColor(Color.white)
+                    .background(Color.orange)
+                    .cornerRadius(10)
             }
             .padding(10)
             .accessibilityHint("タップすると消費税を計算します")
             
-            VStack(spacing: 15){
-                HStack {
-                    Text("金額\u{300}\u{300}\u{300}：")
-                    Text("\(viewModel.formatNumber(viewModel.inputText))")
-                        .frame(width: 200, alignment: .trailing)
-                        .lineLimit(1)
-                    Text("円")
-                }
-                
-                HStack {
-                    Text("消費税込み：")
-                    Text(viewModel.calculatedTax == 0.0 ? "" : "\(Int(viewModel.calculatedTax))")
-                        .frame(width: 200, alignment: .trailing)
-                        .lineLimit(1)
-                    Text("円")
-                }
-            }
-            .accessibilityElement(children: .combine)
-            
-            Spacer()
+            resultView
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity) // 画面全体を埋める
-        .background(Color.green.opacity(0.3)) // 薄いグリーンに設定
-        .edgesIgnoringSafeArea(.all) // セーフエリアを無視して背景を広げる
+                .frame(maxWidth: .infinity, maxHeight: .infinity) // 画面全体を埋める
+                .background(Color.green.opacity(0.3)) // 薄いグリーンに設定
+                .edgesIgnoringSafeArea(.all) // セーフエリアを無視して背景を広げる
+            
+            //エラーアラート
+                .alert("エラー", isPresented: $viewModel.showError) {
+                    Button("OK") {
+                        viewModel.showError = false
+                    }
+                } message: {
+                    Text(viewModel.errorMessage)
+                }
+        }
         
-        //エラーアラート
-        .alert("エラー", isPresented: $viewModel.showError) {
-            Button("OK") {
-                viewModel.showError = false
-            }
-        } message: {
-            Text(viewModel.errorMessage)
+    var resultView: some View {
+        VStack(spacing: 15){
+            AmountDisplayView(
+                title: "税抜金額",
+                amount: viewModel.formatNumber(viewModel.inputText),
+                isTotal: false
+            )
+            Rectangle()
+                .frame(width: 0, height: 40)
+                .foregroundColor(Color.gray.opacity(0.2))
+            
+            AmountDisplayView(
+                title: "税込金額",
+                amount: viewModel.calculatedTax == 0.0 ? "" : viewModel.formatNumber( "\(Int(viewModel.calculatedTax))"),
+                isTotal: true
+            )
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(12)
+        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 2)
+        .padding(.horizontal, 20)
         }
     }
-}
+
 #Preview {
     ContentView()
 }
