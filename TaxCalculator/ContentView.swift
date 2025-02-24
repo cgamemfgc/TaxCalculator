@@ -52,6 +52,13 @@ class TaxCalculatorViewModel: ObservableObject {
         }
         return value
     }
+    
+    // inputTextの監視
+    func onInputTextChenge(){
+        if inputText.isEmpty {
+            showResult = false
+        }
+    }
 }
 
 
@@ -94,6 +101,7 @@ struct ContentView: View {
                         .onChange(of: viewModel.inputText) { oldValue, newValue in if !newValue.isEmpty {
                             viewModel.inputText = viewModel.formatNumber(newValue)
                             }
+                            viewModel.onInputTextChenge()
                         }
                         .accessibilityLabel("価格を入力")
                 } header: {
